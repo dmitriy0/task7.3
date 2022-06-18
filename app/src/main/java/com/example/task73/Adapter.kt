@@ -39,6 +39,8 @@ class Adapter(private val data: ArrayList<Cat>): RecyclerView.Adapter<Adapter.Vi
         val db: Database? = App.instance?.getDatabase()
         val dao = db?.dao()
         holder.dislike.setOnClickListener{
+            App.instance?.needUpdateData = true
+
             val client = HttpClient(OkHttp)
             GlobalScope.launch(Dispatchers.IO) {
                 val response: String = client.post("https://api.thecatapi.com/v1/votes") {
@@ -48,15 +50,6 @@ class Adapter(private val data: ArrayList<Cat>): RecyclerView.Adapter<Adapter.Vi
                     }
                     body = Json.encodeToString(Vote(data[position].id, "user_id", 0))
                     data.removeAt(position)
-                }
-
-                val entityUpdate = EntityUpdate()
-                entityUpdate.id = 0
-                entityUpdate.needUpdate = true
-                if (dao!!.getUpdateById(0)!!.isEmpty()){
-                    dao.insertUpdate(entityUpdate)
-                } else {
-                    dao.updateUpdate(entityUpdate)
                 }
             }
             this@Adapter.notifyItemRemoved(position)

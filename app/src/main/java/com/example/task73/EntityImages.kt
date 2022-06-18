@@ -11,11 +11,3 @@ class EntityImages {
     var id: Int = 0
     var imageCat: String? = null
 }
-
-
-@Entity
-class EntityUpdate {
-    @PrimaryKey
-    var id: Int = 0
-    var needUpdate: Boolean = false
-}

@@ -39,12 +39,10 @@ class ActivityFavourites : AppCompatActivity() {
                     Toast.makeText(this@ActivityFavourites, "from api", Toast.LENGTH_LONG).show()
                 }
             } else {
-                var needUpdate = false
-                if (dao!!.getUpdateById(0)!!.isNotEmpty()) {
-                    needUpdate = dao!!.getUpdateById(0)!![0]!!.needUpdate
-                }
-                if (needUpdate){
+
+                if (App.instance!!.needUpdateData){
                     db!!.clearAllTables()
+                    App.instance?.needUpdateData = false
                     requestToApi()
                     runOnUiThread {
                         Toast.makeText(this@ActivityFavourites, "from api", Toast.LENGTH_LONG).show()
@@ -58,14 +56,9 @@ class ActivityFavourites : AppCompatActivity() {
                         Toast.makeText(this@ActivityFavourites, "from room", Toast.LENGTH_LONG).show()
                     }
                 }
-
-
-
             }
         }
         thread.start()
-
-
     }
 
     private fun requestToApi() {

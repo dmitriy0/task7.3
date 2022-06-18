@@ -6,6 +6,7 @@ import androidx.room.Room
 
 class App : Application() {
     private var database: Database? = null
+    var needUpdateData = false
     override fun onCreate() {
         super.onCreate()
         instance = this

@@ -21,7 +21,6 @@ import kotlinx.serialization.json.Json
 class MainActivity : AppCompatActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     var imageId = ""
-    var needUpdate = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Fresco.initialize(this)
@@ -35,12 +34,11 @@ class MainActivity : AppCompatActivity() {
 
         getRandomImage(client)
 
-        val db: Database? = App.instance?.getDatabase()
-        val dao = db?.dao()
-        needUpdate = false
-
+        App.instance?.needUpdateData = false
 
         like.setOnClickListener{
+            App.instance?.needUpdateData = true
+
             GlobalScope.launch(Dispatchers.IO) {
                 val response: String = client.post("https://api.thecatapi.com/v1/votes") {
                     headers {
@@ -49,17 +47,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     body = Json.encodeToString(Vote(imageId, "user_id", 1))
                 }
-
-                val entityUpdate = EntityUpdate()
-                entityUpdate.id = 0
-                entityUpdate.needUpdate = true
-                if (dao!!.getUpdateById(0)!!.isEmpty()){
-                    dao.insertUpdate(entityUpdate)
-                } else {
-                    dao.updateUpdate(entityUpdate)
-                }
-
-
             }
             getRandomImage(client)
         }
@@ -97,9 +84,4 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
 }
