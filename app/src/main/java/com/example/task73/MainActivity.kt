@@ -40,12 +40,22 @@ class MainActivity : AppCompatActivity() {
             App.instance?.needUpdateData = true
 
             GlobalScope.launch(Dispatchers.IO) {
-                val response: String = client.post("https://api.thecatapi.com/v1/votes") {
-                    headers {
-                        append("Content-Type", "application/json")
-                        append("x-api-key", "e7e933f7-09f6-43e3-a68a-b8e30c70e434")
+                try {
+                    val response: String = client.post("https://api.thecatapi.com/v1/votes") {
+                        headers {
+                            append("Content-Type", "application/json")
+                            append("x-api-key", "e7e933f7-09f6-43e3-a68a-b8e30c70e434")
+                        }
+                        body = Json.encodeToString(Vote(imageId, "user_id", 1))
                     }
-                    body = Json.encodeToString(Vote(imageId, "user_id", 1))
+                } catch(e: Exception) {
+                    this@MainActivity.runOnUiThread {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "something went wrong check your internet connection",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
             getRandomImage(client)
@@ -53,12 +63,22 @@ class MainActivity : AppCompatActivity() {
 
         dislike.setOnClickListener{
             GlobalScope.launch(Dispatchers.IO) {
-                val response: String = client.post("https://api.thecatapi.com/v1/votes") {
-                    headers {
-                        append("Content-Type", "application/json")
-                        append("x-api-key", "e7e933f7-09f6-43e3-a68a-b8e30c70e434")
+                try {
+                    val response: String = client.post("https://api.thecatapi.com/v1/votes") {
+                        headers {
+                            append("Content-Type", "application/json")
+                            append("x-api-key", "e7e933f7-09f6-43e3-a68a-b8e30c70e434")
+                        }
+                        body = Json.encodeToString(Vote(imageId, "something_id", 0))
                     }
-                    body = Json.encodeToString(Vote(imageId, "something_id", 0))
+                } catch(E: Exception) {
+                    this@MainActivity.runOnUiThread {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "something went wrong check your internet connection",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
             getRandomImage(client)
@@ -72,14 +92,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun getRandomImage(client: HttpClient){
         GlobalScope.launch(Dispatchers.IO) {
-            val response = client.get<String>("https://api.thecatapi.com/v1/images/search")
-            val catImage = Json{ignoreUnknownKeys = true}.decodeFromString<List<Cat>>(response)
-            this@MainActivity.runOnUiThread{
-                val uri: Uri =
-                    Uri.parse(catImage[0].url)
-                val image = findViewById<SimpleDraweeView>(R.id.image)
-                image.setImageURI(uri)
-                imageId = catImage[0].id
+            try {
+                val response = client.get<String>("https://api.thecatapi.com/v1/images/search")
+                val catImage =
+                    Json { ignoreUnknownKeys = true }.decodeFromString<List<Cat>>(response)
+                this@MainActivity.runOnUiThread {
+                    val uri: Uri =
+                        Uri.parse(catImage[0].url)
+                    val image = findViewById<SimpleDraweeView>(R.id.image)
+                    image.setImageURI(uri)
+                    imageId = catImage[0].id
+                }
+            } catch(e: Exception) {
+                this@MainActivity.runOnUiThread {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "something went wrong check your internet connection",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
 
         }
